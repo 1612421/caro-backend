@@ -3,11 +3,17 @@ const jwt = require('jsonwebtoken');
 module.exports = {
     generateJWT: (user, secrectKey, expiresIn) => {
         return jwt.sign({
-            id: user.id,
-            account: user.account,
-            email: user.account
+            id: user.id
         }, secrectKey, {
             expiresIn
         });
+    },
+
+    decodeJWT: (token, secretKey) => {
+        return jwt.decode(token, secretKey);
+    },
+
+    verify: (token, secretKey) => {
+        return jwt.verify(token, secretKey);
     }
 }

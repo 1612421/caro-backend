@@ -39,7 +39,11 @@ module.exports= {
         return user.save();
     },
 
-    findOneByAccount: (account => {
+    findOneByAccount: (account) => {
         return User.findOne({account}).exec();
-    })
+    },
+
+    findOneById: (id) => {
+        return User.findById(id).exec();
+    }
 }

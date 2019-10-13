@@ -9,10 +9,10 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-//const getPayloadToken = require('./middleware/get-payload-token');
+const getPayloadToken = require('./middlewares/verify-token');
 
-//var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/user/user');
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/user/user');
 
 var app = express();
 dotenv.config();
@@ -20,16 +20,13 @@ dotenv.config();
 // Config kết nối db
 require('./config/db-connection');
 
-// Config passport
-require('./config/passport');
-
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(validator());
 app.use(cookieParser());
 app.use(session({
-  secret: '1612421',
+  secret: process.env.SECRET_KEY,
   resave: false,
   saveUninitialized: false,
   store: new MongoStore({mongooseConnection: mongoose.connection}),
@@ -37,7 +34,12 @@ app.use(session({
 }));
 app.use(flash());
 
+// Config passport
+require('./config/passport');
+
+app.use(getPayloadToken);
 app.use('/user', usersRouter);
+app.use('/', indexRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -52,7 +54,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.json({messages: err.message});
 });
 
 module.exports = app;

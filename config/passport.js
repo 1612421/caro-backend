@@ -15,6 +15,7 @@ passport.deserializeUser((id, done) => {
     });
 });
 
+// Xử lí đăng ký
 passport.use('local.register', new LocalStrategy({
     usernameField: 'account',
     passwordField: 'password',
@@ -24,6 +25,7 @@ passport.use('local.register', new LocalStrategy({
     req.checkBody('email', 'Invalid email').notEmpty().isEmail();
     req.checkBody('password', 'Invalid password').notEmpty().isLength({min: 4, max: 20});
     req.checkBody('account', 'Invalid account').notEmpty().isLength({min: 4, max: 15});
+    req.checkBody('username', 'Invalid username').notEmpty().isLength({max: 50});
     let errors = req.validationErrors();
 
     if (errors.length > 0){
@@ -55,4 +57,46 @@ passport.use('local.register', new LocalStrategy({
                     .catch(err => done(err));
             });
         })
+}));
+
+// Xử l1 đăng nhập
+passport.use('local.login', new LocalStrategy({
+    usernameField: 'account',
+    passwordField: 'password',
+    passReqToCallback: true
+}, (req, account, password, done) => {
+    // Kiểm tra các field có hợp lệ
+    req.checkBody('account', 'Invalid account').notEmpty().isLength({min: 4, max: 15});
+    req.checkBody('password', 'Invalid password').notEmpty().isLength({min: 4, max: 20});
+    let errors = req.validationErrors();
+
+    if (errors.length > 0){
+        let messages = [];
+
+        errors.forEach(error => {
+            messages.push(error.msg);
+        });
+
+        return done(null, false, {messages: messages});
+    }
+
+    User.findOneByAccount(account)
+        .then(user => {
+            if (!user){
+                return done(null, false, {messages: 'account is not exists'});
+            }
+
+            bcrypt.compare(password, user.password, (err, result) => {
+                if (err){
+                    return done(err);
+                }
+
+                if (!result){
+                    return done(null, false, {messages: 'incorrect password'});
+                }
+
+                return done(null, user);
+            });
+        })
+        .catch(err => done(err));
 }));
