@@ -53,7 +53,7 @@ require('./config/passport');
 //   next();
 // });
 
-const allowOrigin = [/localhost:3000$/, /localhost:3001$/];
+const allowOrigin = [/localhost:3000$/, /localhost:3001$/, /caro-web.herokuapp.com$/, /1612421.github.io$/];
 
 const corsOptions = {
   origin: allowOrigin,    // reqexp will match all prefixes
