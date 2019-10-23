@@ -14,14 +14,14 @@ router.get('/me', isLogged, function(req, res) {
             id: user.id
           }
         });
-      }).catch(err => res.status(500).json({messages: err.message}));
+      }).catch(err => res.status(500).json({messages: [err.message]}));
 });
 
 module.exports = router;
 
 function isLogged(req, res, next){
   if (!req.isLogged){
-    return res.status(400).json({messages: 'you must loggin before send this request'});
+    return res.status(400).json({messages: ['you must loggin before send this request']});
   }
 
   next();

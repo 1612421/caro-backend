@@ -43,7 +43,7 @@ passport.use('local.register', new LocalStrategy({
         .then(user => {
             // Nếu tồn tại
             if (user){
-                return done(null, false, {messages: 'account is exists'});
+                return done(null, false, {messages: ['account is exists']});
             }
 
             bcrypt.hash(password, 5, (err, hash) => {
@@ -83,7 +83,7 @@ passport.use('local.login', new LocalStrategy({
     User.findOneByAccount(account)
         .then(user => {
             if (!user){
-                return done(null, false, {messages: 'account is not exists'});
+                return done(null, false, {messages: ['account is not exists']});
             }
 
             bcrypt.compare(password, user.password, (err, result) => {
@@ -92,7 +92,7 @@ passport.use('local.login', new LocalStrategy({
                 }
 
                 if (!result){
-                    return done(null, false, {messages: 'incorrect password'});
+                    return done(null, false, {messages: ['incorrect password']});
                 }
 
                 return done(null, user);
