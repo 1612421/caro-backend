@@ -10,6 +10,7 @@ const MongoStore = require('connect-mongo')(session);
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const getPayloadToken = require('./middlewares/verify-token');
+const cors = require('cors');
 
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/user/user');
@@ -37,20 +38,34 @@ app.use(flash());
 // Config passport
 require('./config/passport');
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header(
-      'Access-Control-Allow-Headers', 
-      'Origin, X-Request-With, Accept, Authorization'
-  );
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', '*');
+//   res.header(
+//       'Access-Control-Allow-Headers', 
+//       'Origin, X-Request-With, Accept, Authorization, Content-Type'
+//   );
 
-  if (req.method === 'OPTIONS') {
-      res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, PATCH, DELETE');
-      return res.status(200).json({});
-  }
+//   if (req.method === 'OPTIONS') {
+//       res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, PATCH, DELETE');
+//       return res.status(200).json({});
+//   }
 
-  next();
-})
+//   next();
+// });
+
+const allowOrigin = [/localhost:3000$/, /localhost:3001$/];
+
+const corsOptions = {
+  origin: allowOrigin,    // reqexp will match all prefixes
+  methods: "GET,HEAD,POST,PATCH,DELETE,OPTIONS",
+  credentials: true,                // required to pass
+  allowedHeaders: "Content-Type, Authorization, X-Requested-With",
+}
+
+// intercept pre-flight check for all routes
+app.options('*', cors(corsOptions))
+
+app.use(cors(corsOptions));
 
 app.use(getPayloadToken);
 app.use('/user', usersRouter);

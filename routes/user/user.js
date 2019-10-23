@@ -20,7 +20,7 @@ router.post('/register', notLogged, (req, res) => {
             }
 
             let token = jwt.generateJWT(user, process.env.SECRET_KEY, process.env.EXPIRE_IN);
-            res.cookie('Authorization', `Bearer ${token}`, {httpOnly: true});
+            res.cookie('Authorization', `Bearer ${token}`, {httpOnly: true, domain: 'localhost:3001'});
             return res.status(200).json({messages: 'register successfully'});
         });
     })(req, res)
@@ -31,7 +31,6 @@ router.post('/register', notLogged, (req, res) => {
 router.post('/login', notLogged, (req, res) => {
     passport.authenticate('local.login', {session: false}, (err, user, info) => {
         if (err){
-            console.log(err);
             return res.status(500).json({messages: err.message});
         }
         else if (!user){
