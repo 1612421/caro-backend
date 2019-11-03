@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+const bcrypt = require('bcrypt');
 const passport = require('passport');
 const multer = require('../../config/multer-disk-storage');
 const jwt = require('../../FunctionHelpers/jwt');
@@ -109,6 +110,39 @@ router.post('/update-avatar', isLogged, multer.single('avatar'),(req, res) => {
             });
         }).catch(err => {
             res.status(500).json({messages: [err.message]});
+        });
+});
+
+// Xử lí thay đổi mật khẩu
+// POST /user/change-password
+router.post('/change-password', isLogged, (req, res) => {
+    User.findOneById({_id: req.user.id})
+        .then(user => {
+            bcrypt.compare(req.body.oldPassword, user.password, (err, result) => {
+                if (err) {
+                    return res.status(400).json({messages: [err.message]});
+                } 
+
+                if (!result) {
+                    return res.status(400).json({messages: ['Incorrect current password.']});
+                }
+
+                bcrypt.hash(req.body.newPassword, 5, (err, hash) => {
+                    if (err) {
+                        return res.status(400).json({messages: [err.message]});
+                    }
+
+                    User.update({_id: user.id}, {password: hash})
+                        .then(result => {
+                            return res.status(200).json({messages: ['Change password successfully.']});
+                        })
+                        .catch(err => {
+                            return res.status(400).json({messages: [err.message]});
+                        });
+                    });
+            });
+        }).catch(err => {
+            return res.status(400).json({messages: [err.message]});
         });
 });
 
