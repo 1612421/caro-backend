@@ -11,7 +11,8 @@ router.get('/me', isLogged, function(req, res) {
             account: user.account,
             username: user.username,
             email: user.email,
-            id: user.id
+            id: user.id,
+            avatar: user.avatar
           }
         });
       }).catch(err => res.status(500).json({messages: [err.message]}));

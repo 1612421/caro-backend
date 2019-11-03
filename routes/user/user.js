@@ -1,7 +1,9 @@
 var express = require('express');
 var router = express.Router();
 const passport = require('passport');
+const multer = require('../../config/multer-disk-storage');
 const jwt = require('../../FunctionHelpers/jwt');
+const User = require('../../models/user');
 
 // Xử lí đăng ký tài khoản
 // POST /user/register
@@ -57,6 +59,59 @@ router.get('/logout', isLogged, (req, res) => {
     return res.status(200).json({messages: ['logout successfully']});
 });
 
+// Xử lí thay đổi thông tin cá nhân
+// POST /user/update-profile
+router.post('/update-profile', isLogged, (req, res) => {
+
+    // Kiểm tra các field có hợp lệ hay không
+    req.checkBody('email', 'Invalid email').notEmpty().isEmail();
+    req.checkBody('username', 'Invalid username').notEmpty().isLength({min:1, max: 50});
+
+    let errors = req.validationErrors();
+
+    if (errors.length > 0){
+        let messages = [];
+
+        errors.forEach(error => {
+            messages.push(error.msg);
+        });
+
+        return res.status(400).json({messages: messages});
+    }
+
+    const propertiesUpdate = {
+        username: req.body.username,
+        email: req.body.email
+    };
+
+    User.update({_id: req.user.id}, propertiesUpdate)
+        .then((result) => {
+            res.status(200).json({messages: ['update profile successfully']});
+        }).catch(err => {
+            res.status(500).json({messages: [err.message]});
+        });
+});
+
+// Xử lí update avatar
+// POST /user/update-avatar
+router.post('/update-avatar', isLogged, multer.single('avatar'),(req, res) => {
+    var propertiesUpdate = {
+        avatar: `images/${req.user.id}${req.file.originalname}`
+    }
+
+    User.update({_id: req.user.id}, propertiesUpdate)
+        .then((result) => {
+            res.status(200).json({ 
+                messages: ['update avatar successfully'],
+                data: {
+                    urlImg: `images/${req.user.id}${req.file.originalname}`
+                }
+            });
+        }).catch(err => {
+            res.status(500).json({messages: [err.message]});
+        });
+});
+
 module.exports = router;
 
 // Chỉ cho phép sang funtion tiếp theo khi user chưa đăng nhập
@@ -71,7 +126,7 @@ function notLogged(req, res, next){
 // Chỉ cho phép sang function tiếp theo khi user đã đăng nhập
 function isLogged(req, res, next){
     if (!req.isLogged){
-        return res.status(400).json({messages: ['you must loggin before send this request']});
+        return res.status(401).json({messages: ['you must loggin before send this request']});
     }
 
     next();

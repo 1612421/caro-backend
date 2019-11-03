@@ -1,6 +1,7 @@
 var createError = require('http-errors');
 var express = require('express');
 var cookieParser = require('cookie-parser');
+var path = require('path');
 var logger = require('morgan');
 const bodyParser = require('body-parser');
 const flash = require('connect-flash');
@@ -34,24 +35,10 @@ app.use(session({
   cookie: {maxAge: 180 * 60 * 1000} // Phút * giây * mili giây
 }));
 app.use(flash());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Config passport
 require('./config/passport');
-
-// app.use((req, res, next) => {
-//   res.header('Access-Control-Allow-Origin', '*');
-//   res.header(
-//       'Access-Control-Allow-Headers', 
-//       'Origin, X-Request-With, Accept, Authorization, Content-Type'
-//   );
-
-//   if (req.method === 'OPTIONS') {
-//       res.header('Access-Control-Allow-Methods', 'GET, PUT, POST, PATCH, DELETE');
-//       return res.status(200).json({});
-//   }
-
-//   next();
-// });
 
 const allowOrigin = [/localhost:3000$/, /localhost:3001$/, /caro-web.herokuapp.com$/, /1612421.github.io$/];
 

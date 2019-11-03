@@ -25,7 +25,7 @@ passport.use('local.register', new LocalStrategy({
     req.checkBody('email', 'Invalid email').notEmpty().isEmail();
     req.checkBody('password', 'Invalid password').notEmpty().isLength({min: 4, max: 20});
     req.checkBody('account', 'Invalid account').notEmpty().isLength({min: 4, max: 15});
-    req.checkBody('username', 'Invalid username').notEmpty().isLength({max: 50});
+    req.checkBody('username', 'Invalid username').notEmpty().isLength({min: 1, max: 50});
     let errors = req.validationErrors();
 
     if (errors.length > 0){

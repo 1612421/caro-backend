@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const userSchema = Schema({
     username: {
         type: String,
+        minlength: 1,
         maxlength: 50
     },
     fbId: {type: String},
@@ -22,7 +23,8 @@ const userSchema = Schema({
             require: true
         }
     },
-    password: {type: String}
+    password: {type: String},
+    avatar: {type: String},
 });
 
 const User = mongoose.model('User', userSchema);
@@ -33,7 +35,8 @@ module.exports= {
             account: entity.account,
             email: entity.email,
             password: passwordHash,
-            username: entity.username
+            username: entity.username,
+            avatar: 'images/user.jpg'
         });
 
         return user.save();
@@ -45,5 +48,9 @@ module.exports= {
 
     findOneById: (id) => {
         return User.findById(id).exec();
+    },
+
+    update: (conditionObject, properies) => {
+        return User.update(conditionObject, {$set: properies}).exec();
     }
 }
