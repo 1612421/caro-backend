@@ -34,7 +34,9 @@ app.use(session({
   store: new MongoStore({mongooseConnection: mongoose.connection}),
   cookie: {
     maxAge: 180 * 60 * 1000,
-    sameSite: "none"
+    sameSite: "none",
+    httpOnly: true,
+    path: "/"
   } // Phút * giây * mili giây
 }));
 app.use(flash());
