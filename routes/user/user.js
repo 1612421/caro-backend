@@ -23,7 +23,11 @@ router.post('/register', notLogged, (req, res) => {
             }
 
             let token = jwt.generateJWT(user, process.env.SECRET_KEY, process.env.EXPIRE_IN);
-            res.cookie('Authorization', `Bearer ${token}`);
+            res.cookie('Authorization', `Bearer ${token}`, {
+                httpOnly: true,
+                sameSite: "none",
+                secure: true
+            });
             return res.status(200).json({messages: ['register successfully']});
         });
     })(req, res)
