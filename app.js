@@ -32,7 +32,10 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: new MongoStore({mongooseConnection: mongoose.connection}),
-  cookie: {maxAge: 180 * 60 * 1000} // Phút * giây * mili giây
+  cookie: {
+    maxAge: 180 * 60 * 1000,
+    sameSite: "none"
+  } // Phút * giây * mili giây
 }));
 app.use(flash());
 app.use(express.static(path.join(__dirname, 'public')));
