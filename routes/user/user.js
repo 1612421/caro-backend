@@ -50,11 +50,12 @@ router.post('/login', notLogged, (req, res) => {
             }
 
             let token = jwt.generateJWT(user, process.env.SECRET_KEY, process.env.EXPIRE_IN);
-            res.cookie('Authorization', `Bearer ${token}`, {
-                httpOnly: true,
-                sameSite: false,
-                secure: true
-            });
+            res.setHeader("Set-Cookie", `Authorization=Bearer ${token}; Path=/; HttpOnly; Secure, SameSite=None`);
+            // res.cookie('Authorization', `Bearer ${token}`, {
+            //     httpOnly: true,
+            //     secure: true,
+            //     sameSite: false
+            // });
             return res.status(200).json({messages: ['login successfully']});
         });
     })(req, res)
