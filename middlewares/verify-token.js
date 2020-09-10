@@ -14,7 +14,7 @@ module.exports = (req, res, next) => {
 
         // gia hạn token
         token = jwt.generateJWT(decode, process.env.SECRET_KEY, process.env.EXPIRE_IN);
-        res.cookie('Authorization', `Bearer ${token}`, {httpOnly: true});
+        res.cookie('Authorization', `Bearer ${token}`, {httpOnly: true, secure: true, sameSite: false});
 
         // Đánh dấu tài user đã đăng nhập
         req.isLogged = true;
