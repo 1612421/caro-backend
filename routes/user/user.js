@@ -52,7 +52,8 @@ router.post('/login', notLogged, (req, res) => {
             let token = jwt.generateJWT(user, process.env.SECRET_KEY, process.env.EXPIRE_IN);
             res.cookie('Authorization', `Bearer ${token}`, {
                 httpOnly: true,
-                sameSite: false
+                sameSite: false,
+                secure: true
             });
             return res.status(200).json({messages: ['login successfully']});
         });
